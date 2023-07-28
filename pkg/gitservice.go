@@ -42,6 +42,7 @@ func CloneRepo(repo, workdir string) (err error) {
 	return
 }
 
+// GetAllCommits returns all commits in a repository
 func GetAllCommits(workdir string) (commits []string, err error) {
 	ok, err := BinaryExists(GitBinary)
 	if err != nil {
@@ -72,6 +73,7 @@ func GetAllCommits(workdir string) (commits []string, err error) {
 	return
 }
 
+// GetCommitFiles returns all files in a commit
 func GetCommitFiles(workdir, commit string) (files []string, err error) {
 	ok, err := BinaryExists(GitBinary)
 	if err != nil {
@@ -102,6 +104,7 @@ func GetCommitFiles(workdir, commit string) (files []string, err error) {
 	return
 }
 
+// GetFileContent returns the content of a file in a commit
 func GetFileContent(workdir, commit, file string) (r io.Reader, err error) {
 	ok, err := BinaryExists(GitBinary)
 	if err != nil {

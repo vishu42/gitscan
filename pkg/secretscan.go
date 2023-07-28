@@ -8,11 +8,12 @@ import (
 )
 
 const (
-	TOKEN_TYPE_AWS_IAM_KEYID     = "aws_iam_keyid"
-	TOKEN_TYPE_AWS_IAM_KEYSECRET = "aws_iam_keysecret"
-	ErrPathNotAbsolute           = "path is not absolute"
+	TokenTypeAwsIamKeyId     = "aws_iam_keyid"
+	TokenTypeAwsIamKeySecret = "aws_iam_keysecret"
+	ErrPathNotAbsolute       = "path is not absolute"
 )
 
+// Token represents a token along with the line number and commit where it was found
 type Token struct {
 	Token     string
 	TokenType string
@@ -21,6 +22,7 @@ type Token struct {
 	File      string
 }
 
+// TokenPair represents a pair of AWS IAM key and secret along with the commit and file where they were found
 type TokenPair struct {
 	KeyID     string
 	KeySecret string
@@ -43,7 +45,7 @@ func GetPossibleTokenPairs(t []Token) (result []TokenPair) {
 		// create a map of keyid -> []Token
 		keyIDMap := make(map[string][]Token)
 		for _, token := range tokens {
-			if token.TokenType == TOKEN_TYPE_AWS_IAM_KEYID {
+			if token.TokenType == TokenTypeAwsIamKeyId {
 				keyIDMap[token.Token] = append(keyIDMap[token.Token], token)
 			}
 		}
@@ -51,7 +53,7 @@ func GetPossibleTokenPairs(t []Token) (result []TokenPair) {
 		// create a map of keysecret -> []Token
 		keySecretMap := make(map[string][]Token)
 		for _, token := range tokens {
-			if token.TokenType == TOKEN_TYPE_AWS_IAM_KEYSECRET {
+			if token.TokenType == TokenTypeAwsIamKeySecret {
 				keySecretMap[token.Token] = append(keySecretMap[token.Token], token)
 			}
 		}
@@ -78,28 +80,30 @@ func GetPossibleTokenPairs(t []Token) (result []TokenPair) {
 	return
 }
 
+// IsKey returns true if the token is an AWS IAM key, false otherwise
 func IsKey(token string) (isKey bool, keyType string, err error) {
 	re := regexp.MustCompile(`AKIA[0-9A-Z]{16}`)
 	if re.MatchString(token) {
-		// print debug message
 		isKey = true
-		keyType = TOKEN_TYPE_AWS_IAM_KEYID
+		keyType = TokenTypeAwsIamKeyId
 		return
 	}
 	re = regexp.MustCompile(`^[a-zA-Z0-9+=/]{40}$`)
 	if re.MatchString(token) {
 		isKey = true
-		keyType = TOKEN_TYPE_AWS_IAM_KEYSECRET
+		keyType = TokenTypeAwsIamKeySecret
 		return
 	}
 	return
 }
 
+// BareToken is a token without any metadata
 type BareToken struct {
 	token     string
 	tokenType string
 }
 
+// ScanLine scans a line and returns a list of BareToken
 func ScanLine(line string) (awsKeys []BareToken, err error) {
 	// create a new io.Reader for the line
 	stringReader := strings.NewReader(line)
@@ -123,6 +127,7 @@ func ScanLine(line string) (awsKeys []BareToken, err error) {
 	return
 }
 
+// ScanFile scans a file and returns a list of Token
 func ScanFile(r io.Reader, commit string, file string) (result []Token, err error) {
 	lineNo := 0
 	// scan file line by line

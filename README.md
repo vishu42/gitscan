@@ -1,5 +1,10 @@
 # GITSCAN
 
+## Requirements
+git version 2.32.0 
+aws-cli/2.13.3
+go version go1.20.2
+
 ## Compilation and Usage
 
 ```bash

@@ -1,6 +1,14 @@
 # GITSCAN
 
+## Compilation and Usage
+
 ```bash
+# run the following command to build the binary
+go build
+```
+
+```bash
+# run the following command to run the binary
 usage: ./gitscan <git repository url>
 ```
 
